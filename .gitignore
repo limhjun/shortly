@@ -38,3 +38,6 @@ out/
 
 # Dev H2 database files
 /data/
+
+# Local-only TODO file (not for the public repo)
+/todos.md
