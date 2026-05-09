@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: shortly
+      POSTGRES_USER: shortly
+      POSTGRES_PASSWORD: shortly
+    ports:
+      - "5432:5432"
+    volumes:
+      - shortly-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U shortly"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  shortly-pgdata:

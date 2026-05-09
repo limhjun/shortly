@@ -1,0 +1,14 @@
+.git
+.gitignore
+.gradle
+.idea
+build
+data
+docs
+.github
+README.md
+HELP.md
+**/*.md
+.env*
+fly.toml
+compose.yaml
