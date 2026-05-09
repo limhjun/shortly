@@ -22,6 +22,7 @@ dependencies {
 	implementation("com.bucket4j:bucket4j-core:8.10.1")
 	implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
 	// Schema migrations
+	implementation("org.springframework.boot:spring-boot-flyway")
 	implementation("org.flywaydb:flyway-core")
 	runtimeOnly("org.flywaydb:flyway-database-postgresql")
 	// UA family parsing
@@ -44,6 +45,7 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-actuator-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-validation-test")
+	testImplementation("org.springframework.boot:spring-boot-restclient")
 	testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
 	testImplementation("org.springframework.boot:spring-boot-testcontainers")
 	testImplementation("org.testcontainers:testcontainers-junit-jupiter")

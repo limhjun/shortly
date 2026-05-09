@@ -17,6 +17,11 @@ public class IpHasher {
     private final String pepper;
     private final Supplier<LocalDate> dateSupplier;
 
+    // No-arg constructor required by CGLIB subclass proxying (Spring Framework 7).
+    protected IpHasher() {
+        this("", () -> LocalDate.now(ZoneOffset.UTC));
+    }
+
     public IpHasher(@Value("${app.ip-hash-pepper}") String pepper) {
         this(pepper, () -> LocalDate.now(ZoneOffset.UTC));
     }

@@ -16,7 +16,8 @@ import static org.assertj.core.api.Assertions.assertThat;
         "spring.datasource.url=jdbc:h2:mem:test;MODE=PostgreSQL;TRACE_LEVEL_SYSTEM_OUT=0",
         "spring.datasource.driver-class-name=org.h2.Driver",
         "spring.jpa.hibernate.ddl-auto=create-drop",
-        "spring.jpa.database-platform=org.hibernate.dialect.H2Dialect"
+        "spring.jpa.database-platform=org.hibernate.dialect.H2Dialect",
+        "spring.flyway.enabled=false"
 })
 @Sql(scripts = "classpath:sql/test-setup.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
 class ShortUrlRepositoryTest {

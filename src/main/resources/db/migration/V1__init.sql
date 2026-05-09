@@ -16,7 +16,7 @@ CREATE TABLE click_event (
     id                 BIGINT       GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     short_url_id       BIGINT       NOT NULL,
     clicked_at         TIMESTAMP WITH TIME ZONE NOT NULL,
-    ip_hash            CHAR(64)     NOT NULL,
+    ip_hash            VARCHAR(64)  NOT NULL,
     referrer           VARCHAR(2048),
     user_agent_family  VARCHAR(50)
 );
