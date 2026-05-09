@@ -1,10 +1,17 @@
 package limhjun.me.shortly.analytics;
 
+import jakarta.servlet.FilterChain;
 import limhjun.me.shortly.analytics.dto.AnalyticsResponse;
+import limhjun.me.shortly.ratelimit.RateLimitFilter;
 import limhjun.me.shortly.url.ShortUrlNotFoundException;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -15,7 +22,28 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AnalyticsController.class)
+@Import(AnalyticsControllerTest.TestConfig.class)
 class AnalyticsControllerTest {
+
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        RateLimitFilter rateLimitFilter() {
+            // Create a pass-through filter for testing
+            var filter = new RateLimitFilter(null, null) {
+                @Override
+                protected void doFilterInternal(
+                        jakarta.servlet.http.HttpServletRequest req,
+                        jakarta.servlet.http.HttpServletResponse res,
+                        FilterChain chain)
+                        throws jakarta.servlet.ServletException, java.io.IOException {
+                    // Just pass through without rate limiting
+                    chain.doFilter(req, res);
+                }
+            };
+            return filter;
+        }
+    }
 
     @Autowired MockMvc mvc;
     @MockitoBean AnalyticsService service;

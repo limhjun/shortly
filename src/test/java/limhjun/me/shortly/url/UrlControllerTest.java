@@ -1,10 +1,14 @@
 package limhjun.me.shortly.url;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.FilterChain;
 import limhjun.me.shortly.click.ClickRecordedEvent;
+import limhjun.me.shortly.ratelimit.RateLimitFilter;
 import limhjun.me.shortly.url.dto.CreateUrlRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -46,6 +50,23 @@ class UrlControllerTest {
         @Bean
         ClickEventCaptor clickEventCaptor() {
             return new ClickEventCaptor();
+        }
+
+        @Bean
+        RateLimitFilter rateLimitFilter() {
+            // Create a spy and make it pass-through for testing
+            var filter = new RateLimitFilter(null, null) {
+                @Override
+                protected void doFilterInternal(
+                        jakarta.servlet.http.HttpServletRequest req,
+                        jakarta.servlet.http.HttpServletResponse res,
+                        FilterChain chain)
+                        throws jakarta.servlet.ServletException, java.io.IOException {
+                    // Just pass through without rate limiting
+                    chain.doFilter(req, res);
+                }
+            };
+            return filter;
         }
     }
 
