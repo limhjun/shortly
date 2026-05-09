@@ -33,9 +33,13 @@ public class UrlService {
         return repository.save(entity);
     }
 
-    @Cacheable(value = "shortUrl", key = "#code", unless = "#result == null")
     @Transactional(readOnly = true)
     public Optional<ShortUrl> resolve(String code) {
+        return resolveInternal(code);
+    }
+
+    @Cacheable(value = "shortUrl", key = "#code", unless = "#result == null || #result.equals(T(java.util.Optional).empty())")
+    private Optional<ShortUrl> resolveInternal(String code) {
         return repository.findByCode(code);
     }
 
