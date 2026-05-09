@@ -1,5 +1,7 @@
 package limhjun.me.shortly.url;
 
+import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import limhjun.me.shortly.click.ClickRecordedEvent;
@@ -24,20 +26,27 @@ public class UrlController {
     private final ApplicationEventPublisher events;
     private final Clock clock;
     private final String baseUrl;
+    private final Counter createdCounter;
+    private final MeterRegistry registry;
 
     public UrlController(UrlService urlService,
                          ApplicationEventPublisher events,
                          Clock clock,
-                         @Value("${app.base-url}") String baseUrl) {
+                         @Value("${app.base-url}") String baseUrl,
+                         MeterRegistry registry) {
         this.urlService = urlService;
         this.events = events;
         this.clock = clock;
         this.baseUrl = baseUrl;
+        this.registry = registry;
+        this.createdCounter = Counter.builder("shortly.url.created")
+                .register(registry);
     }
 
     @PostMapping("/api/urls")
     public ResponseEntity<UrlResponse> create(@Valid @RequestBody CreateUrlRequest req) {
         ShortUrl saved = urlService.create(req.url());
+        createdCounter.increment();
         UrlResponse body = new UrlResponse(
                 saved.getCode(),
                 baseUrl + "/" + saved.getCode(),
@@ -53,10 +62,12 @@ public class UrlController {
                                           HttpServletRequest request) {
         Optional<ShortUrl> opt = urlService.resolve(code);
         if (opt.isEmpty()) {
+            redirectCounter("not_found").increment();
             return ResponseEntity.notFound().build();
         }
         ShortUrl url = opt.get();
         if (url.getExpiresAt() != null && url.getExpiresAt().isBefore(Instant.now(clock))) {
+            redirectCounter("gone").increment();
             return ResponseEntity.status(HttpStatus.GONE).build();
         }
 
@@ -67,6 +78,7 @@ public class UrlController {
                 request.getHeader("Referer"),
                 request.getHeader("User-Agent")
         ));
+        redirectCounter("found").increment();
 
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.LOCATION, url.getOriginalUrl());
@@ -79,5 +91,11 @@ public class UrlController {
             return forwarded.split(",")[0].trim();
         }
         return request.getRemoteAddr();
+    }
+
+    private Counter redirectCounter(String status) {
+        return Counter.builder("shortly.url.redirect")
+                .tag("status", status)
+                .register(registry);
     }
 }

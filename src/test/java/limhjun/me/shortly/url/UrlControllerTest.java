@@ -1,6 +1,8 @@
 package limhjun.me.shortly.url;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import jakarta.servlet.FilterChain;
 import limhjun.me.shortly.click.ClickRecordedEvent;
 import limhjun.me.shortly.ratelimit.RateLimitFilter;
@@ -50,6 +52,11 @@ class UrlControllerTest {
         @Bean
         ClickEventCaptor clickEventCaptor() {
             return new ClickEventCaptor();
+        }
+
+        @Bean
+        MeterRegistry meterRegistry() {
+            return new SimpleMeterRegistry();
         }
 
         @Bean
